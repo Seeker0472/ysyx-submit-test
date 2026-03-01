@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   parse:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       STUID:  ${{ steps.parse.outputs.STUID }}
       REPO:   ${{ steps.parse.outputs.REPO }}
