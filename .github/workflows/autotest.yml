@@ -345,10 +345,6 @@ jobs:
         if: steps.cache-dir.outputs.cache-hit != 'true'
         run: |
           VFILE=${{ steps.vfilename.outputs.VFILE }}
-          if [ ! -f "$VFILE" ]; then
-            echo "Error: File $VFILE not found!"
-            exit 1
-          fi
           STR=`cat $VFILE | tr '\n' ' ' | grep -E "module\s+ysyx_$STUID" 2> /dev/null`
           if [[ $STR == "" ]]; then
             echo "Can not find module ysyx_$STUID in $VFILE. Abort."
