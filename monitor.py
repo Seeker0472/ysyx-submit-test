@@ -87,7 +87,7 @@ def monitor_output(proc, result_queue):
     result_queue.put("end")
 
 master, slave = pty.openpty()
-proc = subprocess.Popen(args.cmd, stdin=subprocess.PIPE, stdout=slave, stderr=subprocess.STDOUT, text=True)
+proc = subprocess.Popen(args.cmd, stdin=subprocess.PIPE, stdout=slave, text=True)
 os.close(slave)
 
 result_queue = queue.Queue()
