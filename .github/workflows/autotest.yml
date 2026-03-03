@@ -532,6 +532,12 @@ jobs:
         run: |
           make ARCH=riscv32e-npc -C $YSYX_HOME/am-kernels/benchmarks/microbench mainargs=the_insert-arg_rule_in_Makefile_will_insert_mainargs_here
 
+      - name: Upload iverilog-microbench build result
+        uses: actions/upload-artifact@v4
+        with:
+           name: iverilog-microbench-build
+           path: ${{ env.YSYX_HOME }}/am-kernels/benchmarks/microbench/build/
+
       - name: run microbench with iverilog
         run: |
           make -C $NPC_HOME clean
