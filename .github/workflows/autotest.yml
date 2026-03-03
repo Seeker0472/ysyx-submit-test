@@ -504,7 +504,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
            name: rt-thread-build
-           path: $YSYX_HOME/rt-thread-am/bsp/abstract-machine/build/
+           path: ${{ env.YSYX_HOME }}/rt-thread-am/bsp/abstract-machine/build/
            retention-days: 5
 
       - name: rt-thread
