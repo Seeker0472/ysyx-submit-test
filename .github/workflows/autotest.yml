@@ -493,10 +493,21 @@ jobs:
       - name: Install dependency
         run: sudo apt install -y scons
 
-      - name: rt-thread
+      - name: rt-thread init
         run: |
           cd $YSYX_HOME/rt-thread-am/bsp/abstract-machine
           make ARCH=riscv32e-ysyxsoc init
+          make ARCH=riscv32e-ysyxsoc
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v4
+        with:
+           name: rt-thread-build
+           path: $YSYX_HOME/rt-thread-am/bsp/abstract-machine/build/rtthread-*
+           retention-days: 5
+
+      - name: rt-thread
+        run: |
           KEY=$(head -c 5 /dev/urandom | base32)
           python $MONITOR_PY --good=$KEY make ARCH=riscv32e-ysyxsoc run
 
