@@ -548,6 +548,11 @@ jobs:
           make -C $NPC_HOME sim-iverilog IMG=$IMG
           echo "running sim-iverilog with monitor"
           python $MONITOR_PY --good=$KEY make -C $NPC_HOME sim-iverilog IMG=$IMG
+      - name: Upload sim-iverilog gened hex file
+        uses: actions/upload-artifact@v4
+        with:
+           name: iverilog-microbench-hex
+           path: ${{ env.NPC_HOME }}/build/npcmem_init.hex
 
   yosys-sta:
     needs: [parse, setup]
