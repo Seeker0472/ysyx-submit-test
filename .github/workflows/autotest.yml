@@ -350,6 +350,7 @@ jobs:
           make -C $NPC_HOME verilog
           if [[ "${{ steps.npc-mill-cache.outputs.cache-hit }}" != "true" ]]; then
             echo "Saving mill out to cache"
+            ls $NPC_HOME
             mkdir -p npc-mill-out
             cp -a $NPC_HOME/out/. npc-mill-out/
           fi
