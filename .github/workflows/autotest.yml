@@ -298,18 +298,14 @@ jobs:
           key: ${{ runner.os }}-soc-inited-${{ steps.soc-tag.outputs.tag }}
 
       - name: Init ysyxSoC
-        if: steps.soc-verilog-cache.outputs.cache-hit != 'true'
+        if: steps.soc-verilog-cache.outputs.cache-hit != 'true' && steps.soc-cache.outputs.cache-hit != 'true'
         run: |
-          if [[ "${{ steps.soc-cache.outputs.cache-hit }}" == "true" ]]; then
-            echo "Restoring inited ysyxSoC from cache ..."
-          else
-            echo "No inited ysyxSoC cache. Cloning and initializing ..."
-            git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC ysyxSoC-inited
-            git config --global url."https://github.com/".insteadOf "git@github.com:"
-            cd ysyxSoC-inited
-            make dev-init
-            mill __.compile
-          fi
+          echo "No inited ysyxSoC cache. Cloning and initializing ..."
+          git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC ysyxSoC-inited
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          cd ysyxSoC-inited
+          make dev-init
+          mill __.compile
 
       - name: Save inited ysyxSoC to cache
         if: steps.soc-verilog-cache.outputs.cache-hit != 'true' && steps.soc-cache.outputs.cache-hit != 'true'
