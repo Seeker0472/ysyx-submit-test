@@ -283,7 +283,7 @@ jobs:
           else
             echo "No inited ysyxSoC cache. Cloning and initializing ..."
             git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC ysyxSoC-inited
-            sed -i -e 's+git@github.com:+https://github.com/+' ysyxSoC-inited/.gitmodules
+            git config --global url."https://github.com/".insteadOf "git@github.com:"
             cd ysyxSoC-inited
             make dev-init
             mill __.compile

@@ -1,7 +1,5 @@
 name: common
 inputs:
-  OSS_CAD_SUITE_CACHE_KEY:
-    required: true
   YSYX_HOME:
     required: true
   MAKEFLAGS:
