@@ -330,6 +330,9 @@ jobs:
 
         # 缓存 NPC 的 mill 编译缓存，加速编译，
         # 以周为精度匹配，不完全匹配不影响，会自动增量编译
+        #
+        # 仅考虑学员的 mill 缓存在 YSYX_HOME/npc/out
+        # 若放在在其他目录下暂不支持识别
       - name: Cache NPC mill out
         id: npc-mill-cache
         uses: actions/cache@v4
@@ -342,17 +345,18 @@ jobs:
       - name: Generate verilog for NPC
         run: |
           if [[ "${{ steps.npc-mill-cache.outputs.cache-hit }}" == "true" ]]; then
-            echo "Restoring mill out from cache"
+            echo "Try restore mill out from cache"
             mkdir -p $NPC_HOME/out
             cp -a npc-mill-out/. $NPC_HOME/out/
           fi
           touch $NPC_HOME/.timestamp
           make -C $NPC_HOME verilog
           if [[ "${{ steps.npc-mill-cache.outputs.cache-hit }}" != "true" ]]; then
-            echo "Saving mill out to cache"
-            ls $NPC_HOME
-            mkdir -p npc-mill-out
-            cp -a $NPC_HOME/out/. npc-mill-out/
+            if [[ -d $NPC_HOME/out ]]; then
+              echo "Detect mill out dir after generattion, saving to cache"
+              mkdir -p npc-mill-out
+              cp -a $NPC_HOME/out/. npc-mill-out/
+            fi
           fi
 
       - name: Check verilog file name
