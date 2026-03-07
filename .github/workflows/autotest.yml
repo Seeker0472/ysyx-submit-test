@@ -289,10 +289,10 @@ jobs:
           path: ysyxSoC-verilog
           key: ${{ runner.os }}-soc-verilog-${{ needs.parse.outputs.STUID }}-${{ steps.soc-tag.outputs.tag }}-${{ hashFiles('**/ysyx-workbench/patch/ysyxSoC/*') }}
 
-      - name: Restore inited ysyxSoC
+      - name: cache inited ysyxSoC
         id: soc-cache
         if: steps.soc-verilog-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache@v4
         with:
           path: ysyxSoC-inited
           key: ${{ runner.os }}-soc-inited-${{ steps.soc-tag.outputs.tag }}
@@ -301,28 +301,24 @@ jobs:
         if: steps.soc-verilog-cache.outputs.cache-hit != 'true' && steps.soc-cache.outputs.cache-hit != 'true'
         run: |
           echo "No inited ysyxSoC cache. Cloning and initializing ..."
+
           git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC ysyxSoC-inited
+          # 代替原先的 sed 修改 .gitmodules, 有学员的 patch 中修改了 .gitmodules
+          # 现在的流程中 soc 的初始化在 patch 之前，需要保证之后能正常 apply patch
           git config --global url."https://github.com/".insteadOf "git@github.com:"
           cd ysyxSoC-inited
           make dev-init
           mill __.compile
 
-      - name: Save inited ysyxSoC to cache
-        if: steps.soc-verilog-cache.outputs.cache-hit != 'true' && steps.soc-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: ysyxSoC-inited
-          key: ${{ runner.os }}-soc-inited-${{ steps.soc-tag.outputs.tag }}
+          mkdir -p $YSYX_HOME/ysyxSoC/
+          cp -r $YSYX_HOME/ysyxSoC-inited/* $YSYX_HOME/ysyxSoC/
 
       - name: Patch ysyxSoC
         run: |
-          if [[ -d ysyxSoC-inited ]]; then
-            cd ysyxSoC-inited
-            git am $YSYX_HOME/patch/ysyxSoC/*
-          fi
           cd $YSYX_HOME
-          # 此处的 soc 仅包含补丁，提供给后续步骤使用 perip
-          git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC
+          if [[ ! -d ysyxSoC ]]; then
+            git clone --depth 1 -b ysyx6 https://github.com/OSCPU/ysyxSoC
+          fi
           cd ysyxSoC
           git am $YSYX_HOME/patch/ysyxSoC/*
 
@@ -393,11 +389,9 @@ jobs:
               false
             fi
           else
-            make -C ysyxSoC-inited verilog
+            make -C $YSYX_HOME/ysyxSoC verilog
             mkdir -p $CACHED_SOC_VERILOG_DIR
-            mkdir -p $YSYX_HOME/ysyxSoC/build
-            cp ysyxSoC-inited/build/* $CACHED_SOC_VERILOG_DIR
-            cp ysyxSoC-inited/build/* $YSYX_HOME/ysyxSoC/build
+            cp $YSYX_HOME/ysyxSoC/build/* $CACHED_SOC_VERILOG_DIR
           fi
 
       - name: Upload verilog file
