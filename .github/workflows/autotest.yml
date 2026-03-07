@@ -312,6 +312,8 @@ jobs:
             fi
           fi
           cd $YSYX_HOME/ysyxSoC
+          ls $YSYX_HOME/ysyxSoC
+          tree -L 3 $YSYX_HOME/ysyxSoC
           git am $YSYX_HOME/patch/ysyxSoC/*
 
       - name: Clone other repos
