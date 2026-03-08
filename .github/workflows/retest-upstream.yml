@@ -65,11 +65,6 @@ jobs:
               "body": "### 一生一芯学号\n\n24080032\n\n### 仓库URL\n\nhttps://github.com/PengchengYang-xdu/ysyx_24080032_new_ci\n\n### 分支名\n\nnew_ci\n\n### 注释\n\n12月23日重新提交\n\n### make参数\n\n- [x] 不使用'-j'参数, 若cpu-tests等测试由于该参数而失败, 可以勾选此项"
             },
             {
-              "stuid": "24100006",
-              "upstream": 63,
-              "body": "### 一生一芯学号\n\n24100006\n\n### 仓库URL\n\nhttps://github.com/LQ0623/ysyx\n\n### 分支名\n\nci-test\n\n### 注释\n\n第四次提交，修复网表仿真，将CPU访问内存的地址最直接去除高4位，这样的话就不用管出来的地址是0x3000_0000还是0x8000_0000了，因为综合的时候起始地址为0x3000_0000，但是网表仿真的时候为0x8000_0000，所以需要忽略高4位\n\n第三次提交，更换网表，修完fence.i没有替换网表文件\n\n第二次提交，修复fence.i的bug\n\n第一次提交\n\n### make参数\n\n- [x] 不使用'-j'参数, 若cpu-tests等测试由于该参数而失败, 可以勾选此项"
-            },
-            {
               "stuid": "24100012",
               "upstream": 78,
               "body": "### 一生一芯学号\n\n24100012\n\n### 仓库URL\n\nhttps://github.com/kuikuikuizzZ/ysyx-workbench\n\n### 分支名\n\nB5\n\n### 注释\n\nB5\n\n### make参数\n\n- [x] 不使用'-j'参数, 若cpu-tests等测试由于该参数而失败, 可以勾选此项"
