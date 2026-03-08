@@ -3,6 +3,28 @@ name: Auto-test Workflow
 on:
   issues:
     types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to comment on'
+        required: true
+      stuid:
+        description: 'Student ID'
+        required: true
+      repo:
+        description: 'Repository URL'
+        required: true
+      branch:
+        description: 'Branch name'
+        required: true
+      makejobs:
+        description: 'Number of make jobs (1 or nproc value)'
+        required: false
+        default: '1'
+      comment:
+        description: 'Submission comment'
+        required: false
+        default: ''
 
 permissions:
   issues: write
@@ -19,44 +41,65 @@ jobs:
       BRANCH: ${{ steps.parse.outputs.BRANCH }}
       MAKEJOBS: ${{ steps.parse.outputs.MAKEJOBS }}
       COMMENT_ID: ${{ steps.comment-id.outputs.COMMENT_ID }}
+      ISSUE_NUMBER: ${{ steps.parse.outputs.ISSUE_NUMBER }}
     steps:
       - name: Print issue details
         run: |
-          echo "🆕 New Issue Created"
-          echo "---------------------"
-          echo "📌 Title: ${{ github.event.issue.title }}"
-          echo "👤 Author: ${{ github.event.issue.user.login }}"
-          echo "🔗 URL: ${{ github.event.issue.html_url }}"
-          echo ""
-          echo "📝 Body Content:"
-          echo "${{ github.event.issue.body }}"  # 直接输出issue正文
+          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
+            echo "🔄 Workflow Dispatch Triggered"
+            echo "---------------------"
+            echo "📌 STUID: ${{ inputs.stuid }}"
+            echo "🔗 Issue: #${{ inputs.issue_number }}"
+          else
+            echo "🆕 New Issue Created"
+            echo "---------------------"
+            echo "📌 Title: ${{ github.event.issue.title }}"
+            echo "👤 Author: ${{ github.event.issue.user.login }}"
+            echo "🔗 URL: ${{ github.event.issue.html_url }}"
+            echo ""
+            echo "📝 Body Content:"
+            echo "${{ github.event.issue.body }}"  # 直接输出issue正文
+          fi
       - name: Parse information
         id: parse
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          STUID=$(echo "${{ github.event.issue.body }}" | sed -n -e '3p')
-          REPO=$(echo "${{ github.event.issue.body }}" | sed -n -e '7p')
-          BRANCH=$(echo "${{ github.event.issue.body }}" | sed -n -e '11p')
+          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
+            STUID='${{ inputs.stuid }}'
+            REPO='${{ inputs.repo }}'
+            BRANCH='${{ inputs.branch }}'
+            COMMENT='${{ inputs.comment }}'
+            MAKEJOBS='${{ inputs.makejobs }}'
+            ISSUE_NUMBER='${{ inputs.issue_number }}'
+          else
+            STUID=$(echo "$ISSUE_BODY" | sed -n -e '3p')
+            REPO=$(echo "$ISSUE_BODY" | sed -n -e '7p')
+            BRANCH=$(echo "$ISSUE_BODY" | sed -n -e '11p')
+            COMMENT=$(echo "$ISSUE_BODY" | sed -n -e '15p')
+            MAKEJOBS=1
+            if echo "$ISSUE_BODY" | sed -n -e '19p' | grep '^- \[ \] ' ; then
+              MAKEJOBS=`nproc`
+            fi
+            ISSUE_NUMBER='${{ github.event.issue.number }}'
+          fi
           echo "STUID=$STUID" >> $GITHUB_OUTPUT
           echo "REPO=$REPO" >> $GITHUB_OUTPUT
           echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
+          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
 
           sudo timedatectl set-timezone Asia/Shanghai
           DATE=`date +"%F %T.%N"`
-          COMMENT=$(echo "${{ github.event.issue.body }}" | sed -n -e '15p')
           RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           echo "DATE=$DATE" >> $GITHUB_OUTPUT
           echo "COMMENT=$COMMENT" >> $GITHUB_OUTPUT
           echo "RUN_URL=$RUN_URL" >> $GITHUB_OUTPUT
 
-          MAKEJOBS=1
-          if echo "${{ github.event.issue.body }}" | sed -n -e '19p' | grep '^- \[ \] ' ; then
-            MAKEJOBS=`nproc`
-          fi
           echo "MAKEJOBS=$MAKEJOBS" >> $GITHUB_OUTPUT
       - name: Comment the issue
         uses: peter-evans/create-or-update-comment@v1
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ steps.parse.outputs.ISSUE_NUMBER }}
           body: |
             Workflow starts at ${{ steps.parse.outputs.DATE }}
             Comment - ${{ steps.parse.outputs.COMMENT }}
@@ -65,7 +108,7 @@ jobs:
         uses: peter-evans/find-comment@v3
         id: fc
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ steps.parse.outputs.ISSUE_NUMBER }}
           comment-author: 'github-actions[bot]'
           body-includes: Workflow starts at ${{ steps.parse.outputs.DATE }}
       - name: Export comment ID
@@ -187,7 +230,7 @@ jobs:
       - name: Comment the issue
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ needs.parse.outputs.ISSUE_NUMBER }}
           comment-id: ${{ needs.parse.outputs.COMMENT_ID }}
           body: |
             +++++ tracer-ysyx +++++
@@ -807,16 +850,17 @@ jobs:
       - name: Comment the issue
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ needs.parse.outputs.ISSUE_NUMBER }}
           comment-id: ${{ needs.parse.outputs.COMMENT_ID }}
           body: |
             Finish
           edit-mode: append
 
       - name: Close the issue
+        if: github.event_name != 'workflow_dispatch'
         uses: peter-evans/close-issue@v2
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ needs.parse.outputs.ISSUE_NUMBER }}
 
   error-handler:
     runs-on: ubuntu-22.04
@@ -826,7 +870,7 @@ jobs:
       - name: Comment the issue
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ needs.parse.outputs.ISSUE_NUMBER }}
           comment-id: ${{ needs.parse.outputs.COMMENT_ID }}
           body: |
             End with errors
