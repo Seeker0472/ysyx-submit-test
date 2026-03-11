@@ -459,6 +459,7 @@ jobs:
       - name: Common operations
         uses: ./.github/actions/common
         with:
+          OSS_CAD_HOME: ${{ needs.setup.outputs.OSS_CAD_HOME }}
           YSYX_HOME: ${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
           MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
