@@ -49,7 +49,7 @@ runs:
         MONITOR_PY="`pwd`/monitor.py"
         echo "MONITOR_PY=$MONITOR_PY" >> $GITHUB_ENV
 
-        YSYX_HOME=${{ inputs.YSYX_HOME }}
+        YSYX_HOME=$(realpath ${{ inputs.YSYX_HOME }})
         echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
         echo "NEMU_HOME=$YSYX_HOME/nemu" >> $GITHUB_ENV
         echo "AM_HOME=$YSYX_HOME/abstract-machine" >> $GITHUB_ENV
