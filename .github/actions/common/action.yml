@@ -18,10 +18,11 @@ runs:
     - name: Extract workbench
       shell: bash
       run: |
-        TEMP_DIR=$(dirname ${{ inputs.YSYX_HOME }})
+        TEMP_DIR=$(realpath $(dirname ${{ inputs.YSYX_HOME }}))
         mkdir -p $TEMP_DIR
         cd $TEMP_DIR
         tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
+        ls $TEMP_DIR
 
     - name: Cache oss-cad-suite cache
       id: oss-cad-suite-cache
