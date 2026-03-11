@@ -1,5 +1,7 @@
 name: common
 inputs:
+  OSS_CAD_HOME:
+    required: true
   YSYX_HOME:
     required: true
   MAKEFLAGS:
@@ -62,7 +64,7 @@ runs:
         MAKEFLAGS=${{ inputs.MAKEFLAGS }}
         echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
 
-        OSS_CAD_SUITE_BIN_PATH=`pwd`/oss-cad-suite/bin
+        OSS_CAD_SUITE_BIN_PATH=${{ inputs.OSS_CAD_HOME }}/bin
         echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
 
     - name: Clone other repos
