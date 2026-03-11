@@ -441,6 +441,11 @@ jobs:
   cpu-tests:
     needs: setup
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
