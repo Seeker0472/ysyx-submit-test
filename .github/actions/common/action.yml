@@ -8,7 +8,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Download workbench
+    - name: Download workbench
       uses: actions/download-artifact@v4
       with:
         name: workbench
