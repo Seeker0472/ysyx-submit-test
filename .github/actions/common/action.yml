@@ -8,6 +8,21 @@ inputs:
 runs:
   using: "composite"
   steps:
+      - name: Download workbench
+      uses: actions/download-artifact@v4
+      with:
+        name: workbench
+        path: /tmp/artifact-download
+    - name: Extract workbench
+      shell: bash
+      run: |
+        TEMP_DIR=$(dirname $YSYX_HOME)
+        mkdir -p $TEMP_DIR
+        cd $TEMP_DIR
+        tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
+        echo $TEMP_DIR
+        ls $TEMP_DIR
+        
     - name: Set environment variables
       shell: bash
       run: |
@@ -26,21 +41,6 @@ runs:
 
         MAKEFLAGS=${{ inputs.MAKEFLAGS }}
         echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
-        
-    - name: Download workbench
-      uses: actions/download-artifact@v4
-      with:
-        name: workbench
-        path: /tmp/artifact-download
-    - name: Extract workbench
-      shell: bash
-      run: |
-        TEMP_DIR=$(dirname $YSYX_HOME)
-        mkdir -p $TEMP_DIR
-        cd $TEMP_DIR
-        tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
-        echo $TEMP_DIR
-        ls $TEMP_DIR
 
     - name: Cache oss-cad-suite
       id: oss-cad-suite-cache
