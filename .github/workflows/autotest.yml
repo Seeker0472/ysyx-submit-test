@@ -111,7 +111,7 @@ jobs:
           TEMP_DIR=$(mktemp -d -p .)
           cd $TEMP_DIR
           YSYX_HOME=$(pwd)/ysyx-workbench
-          echo "RELATIVE_YSYX_HOME=$TEMP_DIR/yxyx-workbench" >> $GITHUB_OUTPUT
+          echo "RELATIVE_YSYX_HOME=$TEMP_DIR/ysyx-workbench" >> $GITHUB_OUTPUT
           echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
           echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_OUTPUT
 
