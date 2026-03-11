@@ -22,6 +22,7 @@ runs:
         mkdir -p $TEMP_DIR
         cd $TEMP_DIR
         tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
+        echo $TEMP_DIR
         ls $TEMP_DIR
 
     - name: Cache oss-cad-suite cache
