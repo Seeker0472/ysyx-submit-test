@@ -8,6 +8,24 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set environment variables
+      shell: bash
+      run: |
+        MONITOR_PY="`pwd`/monitor.py"
+        echo "MONITOR_PY=$MONITOR_PY" >> $GITHUB_ENV
+
+        RELATIVE_YSYX_HOME=${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
+        # 不能使用 realpath chi'si此时该目录还不存在
+        YSYX_HOME=`pwd`/$RELATIVE_YSYX_HOME
+        echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
+        echo "NEMU_HOME=$YSYX_HOME/nemu" >> $GITHUB_ENV
+        echo "AM_HOME=$YSYX_HOME/abstract-machine" >> $GITHUB_ENV
+        echo "NAVY_HOME=$YSYX_HOME/navy-apps" >> $GITHUB_ENV
+        echo "NPC_HOME=$YSYX_HOME/npc" >> $GITHUB_ENV
+        echo "NVBOARD_HOME=$YSYX_HOME/nvboard" >> $GITHUB_ENV
+
+        MAKEFLAGS=${{ inputs.MAKEFLAGS }}
+        echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
     - name: Download workbench
       uses: actions/download-artifact@v4
       with:
@@ -22,26 +40,6 @@ runs:
         tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
         echo $TEMP_DIR
         ls $TEMP_DIR
-        
-    - name: Set environment variables
-      shell: bash
-      run: |
-        MONITOR_PY="`pwd`/monitor.py"
-        echo "MONITOR_PY=$MONITOR_PY" >> $GITHUB_ENV
-
-        RELATIVE_YSYX_HOME=${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
-
-        YSYX_HOME=$(realpath $RELATIVE_YSYX_HOME)
-        echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
-        echo "NEMU_HOME=$YSYX_HOME/nemu" >> $GITHUB_ENV
-        echo "AM_HOME=$YSYX_HOME/abstract-machine" >> $GITHUB_ENV
-        echo "NAVY_HOME=$YSYX_HOME/navy-apps" >> $GITHUB_ENV
-        echo "NPC_HOME=$YSYX_HOME/npc" >> $GITHUB_ENV
-        echo "NVBOARD_HOME=$YSYX_HOME/nvboard" >> $GITHUB_ENV
-
-        MAKEFLAGS=${{ inputs.MAKEFLAGS }}
-        echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
-
     - name: Cache oss-cad-suite
       id: oss-cad-suite-cache
       uses: actions/cache@v4
