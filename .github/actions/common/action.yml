@@ -8,7 +8,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-      - name: Set environment variables
+    - name: Set environment variables
       shell: bash
       run: |
         MONITOR_PY="`pwd`/monitor.py"
