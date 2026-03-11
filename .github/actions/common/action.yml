@@ -55,7 +55,7 @@ runs:
         OSS_CAD_SUITE_BIN_PATH=`pwd`/oss-cad-suite/bin
         ls $OSS_CAD_SUITE_BIN_PATH
         ls `pwd`/oss-cad-suite
-        echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
+        echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_PATH
 
     - name: Install Mill
       shell: bash
