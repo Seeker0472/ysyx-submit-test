@@ -441,6 +441,11 @@ jobs:
   hello:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -484,6 +489,11 @@ jobs:
   riscv-tests:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -501,6 +511,11 @@ jobs:
   riscv-arch-test:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -518,6 +533,11 @@ jobs:
   microbench:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -534,6 +554,11 @@ jobs:
   rt-thread:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -555,6 +580,11 @@ jobs:
   iverilog-microbench:
     needs: [parse]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -680,6 +710,11 @@ jobs:
   iverilog-netlist-microbench:
     needs: [parse, yosys-sta]
     runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/wangyijie020/dockertest:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
