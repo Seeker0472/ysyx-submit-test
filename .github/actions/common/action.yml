@@ -63,21 +63,6 @@ runs:
         OSS_CAD_SUITE_BIN_PATH=`pwd`/oss-cad-suite/bin
         echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
 
-      # TODO: 优化 apt 安装速度，缓存 /usr/bin 较为麻烦
-      # 考虑安装到 workspace 目录下缓存，或者使用 docker 镜像等
-    - name: Install RISC-V toolchain
-      shell: bash
-      if: inputs.install-toolchain == 'true'
-      run: |
-        sudo apt update
-        sudo apt install -y g++-riscv64-linux-gnu llvm llvm-dev
-        sudo sed -i -e '8d' /usr/riscv64-linux-gnu/include/gnu/stubs.h
-
-    - name: Install dependency for NVBoard
-      shell: bash
-      if: inputs.install-toolchain == 'true'
-      run: sudo apt install -y libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev
-
     - name: Clone other repos
       shell: bash
       run: |
