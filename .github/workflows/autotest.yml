@@ -78,6 +78,7 @@ jobs:
     needs: parse
     runs-on: ubuntu-22.04
     outputs:
+      OSS_CAD_HOME: ${{ steps.setup-tools.outputs.OSS_CAD_HOME }}
       RELATIVE_YSYX_HOME: ${{ steps.set-ysyx-home.outputs.RELATIVE_YSYX_HOME }}
       YSYX_HOME: ${{ steps.set-ysyx-home.outputs.YSYX_HOME }}
       VFILE:     ${{ steps.vfilename.outputs.VFILE }}
@@ -267,9 +268,11 @@ jobs:
           tar xf $ASSET_NAME
 
       - name: Setup tools
+        id: setup-tools
         run: |
           OSS_CAD_SUITE_BIN_PATH=`pwd`/oss-cad-suite/bin
           echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
+          echo "OSS_CAD_HOME=$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_OUTPUT
 
           mkdir -p ~/.local/bin
           MILL_VERSION=0.11.13
