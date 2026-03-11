@@ -413,6 +413,18 @@ jobs:
           name: verilog
           path: ${{ steps.vfilename.outputs.VFILE }}
 
+      - name: Save setup outputs
+        run: |
+          echo "RELATIVE_YSYX_HOME=${{ steps.set-ysyx-home.outputs.RELATIVE_YSYX_HOME }}" > /tmp/setup-outputs.env
+          echo "VFILE=${{ steps.vfilename.outputs.VFILE }}" >> /tmp/setup-outputs.env
+          echo "MAKEFLAGS=${{ steps.set-env.outputs.MAKEFLAGS }}" >> /tmp/setup-outputs.env
+      - name: Upload setup outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: setup-outputs
+          path: /tmp/setup-outputs.env
+          retention-days: 1
+
       - name: Pack workbench
         run: |
           cd $YSYX_HOME/..
@@ -427,7 +439,7 @@ jobs:
           retention-days: 1
 
   hello:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -436,9 +448,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: hello
         run: |
@@ -446,7 +455,7 @@ jobs:
           python $MONITOR_PY --middle="Hello, AbstractMachine!" --good=$KEY make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/kernels/hello run mainargs=$KEY
 
   cpu-tests:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     container:
       image: ghcr.io/wangyijie020/dockertest:latest
@@ -460,10 +469,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          OSS_CAD_HOME: ${{ needs.setup.outputs.OSS_CAD_HOME }}
-          YSYX_HOME: ${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
         
       - name: cpu-tests
         run: |
@@ -477,7 +482,7 @@ jobs:
           limit-access-to-actor: false
 
   riscv-tests:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -486,9 +491,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: riscv-tests
         run: |
@@ -497,7 +499,7 @@ jobs:
           make ARCH=riscv32e-ysyxsoc -C riscv-tests-am run TEST_ISA=i
 
   riscv-arch-test:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -506,9 +508,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: riscv-arch-test
         run: |
@@ -517,7 +516,7 @@ jobs:
           make ARCH=riscv32e-ysyxsoc -C riscv-arch-test-am run TEST_ISA="E Zifencei"
 
   microbench:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -526,9 +525,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: microbench
         run: |
@@ -536,7 +532,7 @@ jobs:
           python $MONITOR_PY --good="$KEY" make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/benchmarks/microbench run mainargs=$KEY
 
   rt-thread:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -545,9 +541,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: Install dependency
         run: sudo apt install -y scons
@@ -560,7 +553,7 @@ jobs:
           python $MONITOR_PY --good=$KEY make ARCH=riscv32e-ysyxsoc run
 
   iverilog-microbench:
-    needs: setup
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -569,9 +562,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: compile microbench
         run: |
@@ -586,7 +576,7 @@ jobs:
           python $MONITOR_PY --good=$KEY make -C $NPC_HOME sim-iverilog IMG=$IMG
 
   yosys-sta:
-    needs: [parse, setup]
+    needs: [parse]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -596,8 +586,6 @@ jobs:
       - name: Common operations
         uses: ./.github/actions/common
         with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
           install-toolchain: 'false'
 
       - name: Install dependency
@@ -618,7 +606,6 @@ jobs:
       - name: Set environment variables
         run: |
           echo "STUID=${{ needs.parse.outputs.STUID }}" >> $GITHUB_ENV
-          echo "VFILE=${{ needs.setup.outputs.VFILE }}" >> $GITHUB_ENV
 
       - name: Run STA
         run: |
@@ -691,7 +678,7 @@ jobs:
           path: yosys-sta/result/ysyx_${{ needs.parse.outputs.STUID }}-500MHz/ysyx_${{ needs.parse.outputs.STUID }}.netlist.fixed.v
 
   iverilog-netlist-microbench:
-    needs: [parse, setup, yosys-sta]
+    needs: [parse, yosys-sta]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -700,9 +687,6 @@ jobs:
 
       - name: Common operations
         uses: ./.github/actions/common
-        with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
 
       - name: Download verilog file
         uses: actions/download-artifact@v4
@@ -756,8 +740,6 @@ jobs:
       - name: Common operations
         uses: ./.github/actions/common
         with:
-          YSYX_HOME: ${{ needs.setup.outputs.YSYX_HOME }}
-          MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
           install-toolchain: 'false'
 
       - name: Set Git user and email
