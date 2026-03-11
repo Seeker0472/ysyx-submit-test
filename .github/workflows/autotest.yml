@@ -78,6 +78,7 @@ jobs:
     needs: parse
     runs-on: ubuntu-22.04
     outputs:
+      RELATIVE_YSYX_HOME: ${{ steps.set-ysyx-home.outputs.RELATIVE_YSYX_HOME }}
       YSYX_HOME: ${{ steps.set-ysyx-home.outputs.YSYX_HOME }}
       VFILE:     ${{ steps.vfilename.outputs.VFILE }}
       MAKEFLAGS: ${{ steps.set-env.outputs.MAKEFLAGS }}
@@ -110,6 +111,7 @@ jobs:
           TEMP_DIR=$(mktemp -d -p .)
           cd $TEMP_DIR
           YSYX_HOME=$(pwd)/ysyx-workbench
+          RELATIVE_YSYX_HOME=$(TMP_DIR)/ysyx-workbench
           echo "RELATIVE_YSYX_HOME=$(TMP_DIR)/yxyx-workbench" >> $GITHUB_OUTPUT
           echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
           echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_OUTPUT
