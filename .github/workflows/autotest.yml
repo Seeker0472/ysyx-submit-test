@@ -470,6 +470,9 @@ jobs:
           make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/tests/cpu-tests run ALL=dummy
           make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/tests/cpu-tests run
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
   riscv-tests:
     needs: setup
     runs-on: ubuntu-22.04
