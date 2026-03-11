@@ -464,16 +464,17 @@ jobs:
           OSS_CAD_HOME: ${{ needs.setup.outputs.OSS_CAD_HOME }}
           YSYX_HOME: ${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
           MAKEFLAGS: ${{ needs.setup.outputs.MAKEFLAGS }}
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: false
         
       - name: cpu-tests
         run: |
           make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/tests/cpu-tests run ALL=dummy
           make ARCH=riscv32e-ysyxsoc -C $YSYX_HOME/am-kernels/tests/cpu-tests run
+      
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: failure()
+        with:
+          limit-access-to-actor: false
 
   riscv-tests:
     needs: setup
