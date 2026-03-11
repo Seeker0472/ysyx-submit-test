@@ -1,9 +1,5 @@
 name: common
 inputs:
-  OSS_CAD_HOME:
-    required: true
-  YSYX_HOME:
-    required: true
   MAKEFLAGS:
     required: true
   install-toolchain:
@@ -12,6 +8,25 @@ inputs:
 runs:
   using: "composite"
   steps:
+      - name: Set environment variables
+      shell: bash
+      run: |
+        MONITOR_PY="`pwd`/monitor.py"
+        echo "MONITOR_PY=$MONITOR_PY" >> $GITHUB_ENV
+
+        RELATIVE_YSYX_HOME=${{ needs.setup.outputs.RELATIVE_YSYX_HOME }}
+
+        YSYX_HOME=$(realpath $RELATIVE_YSYX_HOME)
+        echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
+        echo "NEMU_HOME=$YSYX_HOME/nemu" >> $GITHUB_ENV
+        echo "AM_HOME=$YSYX_HOME/abstract-machine" >> $GITHUB_ENV
+        echo "NAVY_HOME=$YSYX_HOME/navy-apps" >> $GITHUB_ENV
+        echo "NPC_HOME=$YSYX_HOME/npc" >> $GITHUB_ENV
+        echo "NVBOARD_HOME=$YSYX_HOME/nvboard" >> $GITHUB_ENV
+
+        MAKEFLAGS=${{ inputs.MAKEFLAGS }}
+        echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
+        
     - name: Download workbench
       uses: actions/download-artifact@v4
       with:
@@ -20,7 +35,7 @@ runs:
     - name: Extract workbench
       shell: bash
       run: |
-        TEMP_DIR=$(realpath $(dirname ${{ inputs.YSYX_HOME }}))
+        TEMP_DIR=$(dirname $YSYX_HOME)
         mkdir -p $TEMP_DIR
         cd $TEMP_DIR
         tar -xzf /tmp/artifact-download/ysyx-workbench.tar.gz
@@ -69,23 +84,6 @@ runs:
         curl -L "https://github.com/com-lihaoyi/mill/releases/download/$MILL_VERSION/$MILL_VERSION" -o ~/.local/bin/mill
         chmod +x ~/.local/bin/mill
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Set environment variables
-      shell: bash
-      run: |
-        MONITOR_PY="`pwd`/monitor.py"
-        echo "MONITOR_PY=$MONITOR_PY" >> $GITHUB_ENV
-
-        YSYX_HOME=$(realpath ${{ inputs.YSYX_HOME }})
-        echo "YSYX_HOME=$YSYX_HOME" >> $GITHUB_ENV
-        echo "NEMU_HOME=$YSYX_HOME/nemu" >> $GITHUB_ENV
-        echo "AM_HOME=$YSYX_HOME/abstract-machine" >> $GITHUB_ENV
-        echo "NAVY_HOME=$YSYX_HOME/navy-apps" >> $GITHUB_ENV
-        echo "NPC_HOME=$YSYX_HOME/npc" >> $GITHUB_ENV
-        echo "NVBOARD_HOME=$YSYX_HOME/nvboard" >> $GITHUB_ENV
-
-        MAKEFLAGS=${{ inputs.MAKEFLAGS }}
-        echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
 
     - name: Clone other repos
       shell: bash
