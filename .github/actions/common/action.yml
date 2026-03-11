@@ -49,6 +49,7 @@ runs:
 
     - name: Setup oss-cad-suite
       id: setup-tools
+      shell: bash
       run: |
         OSS_CAD_SUITE_BIN_PATH=`pwd`/oss-cad-suite/bin
         echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
@@ -82,9 +83,6 @@ runs:
 
         MAKEFLAGS=${{ inputs.MAKEFLAGS }}
         echo "MAKEFLAGS=$MAKEFLAGS" >> $GITHUB_ENV
-
-        OSS_CAD_SUITE_BIN_PATH=${{ inputs.OSS_CAD_HOME }}/bin
-        echo "PATH=$PATH:$OSS_CAD_SUITE_BIN_PATH" >> $GITHUB_ENV
 
     - name: Clone other repos
       shell: bash
